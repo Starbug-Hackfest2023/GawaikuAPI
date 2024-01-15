@@ -22,3 +22,19 @@ module.exports.shopList = async (_filter, page, row) => {
         throw new BadRequestError(error.message);
     }
 }
+
+module.exports.viewShop = async (username) => {
+    try {
+        mongoDb.setCollection('shop');
+
+        const result = await mongoDb.findOne({ username : username });
+        if (validate.isEmpty(result.data)) {
+            throw new NotFoundError('Data not found');
+        }
+
+        result.data = {...result.data, password : "***"};
+        return result;
+    } catch (error) {
+        throw new BadRequestError(error.message);
+    }
+}
