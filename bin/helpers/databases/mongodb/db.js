@@ -153,8 +153,8 @@ class DB {
             const parameterSort = {};
             parameterSort[fieldName] = 1;
             const parameterPage = row * (page - 1);
-            // const recordset = await db.find(param).sort(parameterSort).limit(row).skip(parameterPage)
-            const recordset = await db.find(param)
+            // const recordset = await db.find(param)
+            const recordset = await db.find(param).sort(parameterSort).limit(row).skip(parameterPage)
                 .toArray();
             if (validate.isEmpty(recordset)) {
                 return wrapper.error('Data Not Found, Please Try Another Input');
