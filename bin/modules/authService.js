@@ -133,8 +133,8 @@ module.exports.viewUser = async (userId) => {
         if (recordSet.err) {
             throw new NotFoundError('User not found')
         }
-
         const maskedResult = {...recordSet.data, password: '****'};
+        console.log(maskedResult)
         return maskedResult;
     } catch (error) {
         throw new BadRequestError('User not found')

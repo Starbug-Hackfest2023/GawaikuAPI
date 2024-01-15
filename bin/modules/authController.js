@@ -1,10 +1,15 @@
 const wrapper = require('../helpers/utils/wrapper');
 const authService = require('./authService');
 const md5 = require('md5');
+const emailDetector = require('../helpers/utils/emailDetector');
 
 module.exports.loginUser = async (req, res) => {
     let username = req.body.username? req.body.username: null;
-    let email = req.body.email? req.body.email: null;
+    let email = null;
+    if (emailDetector.isValidEmail(username)) {
+        email = username;
+        username = null;
+    }
     let password = req.body.password;
 
     authService.loginUser(username, email, password)
@@ -86,7 +91,7 @@ module.exports.viewUser = async (req, res) => {
     authService.viewUser(userId)
         .then(resp => {
             console.log('User has found');
-            wrapper.response(res, 'success', resp, 'User has found', 200);
+            wrapper.response(res, 'success', wrapper.data(resp), 'User has found', 200);
         })
         .catch(err => {
             console.log('User not found');
