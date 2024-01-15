@@ -99,6 +99,20 @@ module.exports.viewUser = async (req, res) => {
         });
 }
 
+module.exports.viewProfile = async (req, res) => {
+    const userData = req.userData;
+
+    authService.viewUser(userData.id)
+        .then(resp => {
+            console.log('User has found');
+            wrapper.response(res, 'success', wrapper.data(resp), 'User has found', 200);
+        })
+        .catch(err => {
+            console.log('User not found');
+            wrapper.response(res, 'fail', wrapper.error(err), `Error while finding user. Error: ${err}`, 404);
+        });
+}
+
 module.exports.viewShop = async (req, res) => {
     const shopId = req.params.id;
 
