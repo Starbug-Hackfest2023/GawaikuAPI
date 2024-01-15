@@ -7,6 +7,7 @@ const router = express.Router();
 const shopController = require('../modules/shopController');
 
 // router.post('/loginUser', authController.loginUser);
-router.get('/shopList', userAuth, shopController.shopList);
+// router.get('/shopList', userAuth, shopController.shopList);
+router.get('/shopList', shopController.shopList);
 
 module.exports = router; 
