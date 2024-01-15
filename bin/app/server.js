@@ -3,7 +3,8 @@ const wrapper = require('../helpers/utils/wrapper');
 const bodyParser = require('body-parser');
 const mongoConnectionPooling = require('../helpers/databases/mongodb/connection');
 const express = require('express');
-const authRoutes = require('../routers/authRoutes')
+const authRoutes = require('../routers/authRoutes');
+const shopRoutes = require('../routers/shopRoutes');
 
 function AppServer() {
     this.server = express();
@@ -19,6 +20,7 @@ function AppServer() {
 
     //Routing
     this.server.use('/auth', authRoutes);
+    this.server.use('/shop', shopRoutes);
 
     // exception handling
     this.server.use((error, req, res, next) => {
