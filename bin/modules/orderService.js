@@ -8,7 +8,7 @@ const { ObjectId } = require('mongodb');
 const { STATUS } = require('../config/const/orderStatus');
 const { viewUser } = require('./authService');
 const { viewShop } = require('./shopServices');
-const { stat } = require('fs');
+const moment = require('moment');
 
 module.exports.userOrder = async (orderData, userData, usernameToko) => {
     try {
@@ -56,11 +56,24 @@ module.exports.updateOrder = async (userId, usernameToko, status, namaBarang, st
         const pemesan = await viewUser(userId);
         const toko = await viewShop(usernameToko);
 
+        const dataPemesan = {
+            namaPemesan : pemesan.fullname,
+            noTelp : pemesan.phoneNumber,
+            alamat : pemesan.address,
+        }
+
+        const dataToko = {
+            namaToko : toko.data.shopName,
+            alamatToko : toko.data.address,
+            telpToko : toko.data.phone_number
+        }
+
         const orderData = await mongoDb.findOne({
-            pemesan,
-            toko,
+            pemesan : dataPemesan,
+            toko : dataToko,
             namaBarang,
         });
+        console.log(orderData);
 
         if (validate.isEmpty(orderData)) {
             throw new NotFoundError('Order not found');
@@ -73,7 +86,8 @@ module.exports.updateOrder = async (userId, usernameToko, status, namaBarang, st
                 $set : {
                     status,
                     step,
-                    activeStep
+                    activeStep,
+                    updatedAt : moment().local().format()
                 }
             }
         );

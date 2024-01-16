@@ -7,6 +7,6 @@ const router = express.Router();
 const orderController = require('../modules/orderController');
 
 router.post('/', userAuth, orderController.userOrder);
-router.put('/update', userAuth, orderController.updateOrder);
+router.put('/', userAuth, orderController.updateOrder);
 
 module.exports = router;
