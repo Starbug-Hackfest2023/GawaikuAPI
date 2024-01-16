@@ -89,10 +89,25 @@ module.exports.loginShop = async (username, email, password) => {
 
 module.exports.registerUser = async (userData) => {
     try {
-        mongoDb.setCollection('user');
         const username = userData.username;
-        const recordSet = await mongoDb.findOne({ username });
-        if (!validate.isEmpty(recordSet.data)) {
+        const authData = {
+            username : userData.username,
+            email : userData.email,
+            password : userData.password,
+        }
+        
+        userData.password = md5(userData.password);
+        mongoDb.setCollection('auth');
+        const duplDataAuth = await mongoDb.findOne({ username });
+        if (!validate.isEmpty(duplDataAuth.data)) {
+            console.log('Username already exist');
+            throw new ConflictError('Username already exist');
+        }
+        await mongoDb.insertOne(authData);
+
+        mongoDb.setCollection('user');
+        const duplDataUser = await mongoDb.findOne({ username });
+        if (!validate.isEmpty(duplDataUser.data)) {
             console.log('Username already exist');
             throw new ConflictError('Username already exist');
         }
@@ -134,6 +149,26 @@ module.exports.viewUser = async (userId) => {
             throw new NotFoundError('User not found')
         }
         const maskedResult = {...recordSet.data, password: '****'};
+        return maskedResult;
+    } catch (error) {
+        throw new BadRequestError('User not found')
+    }
+}
+
+module.exports.viewProfile = async (userId) => {
+    try {
+        mongoDb.setCollection('user');
+        const id = new ObjectId(userId);
+        const recordSet = await mongoDb.findOne({ _id: id });
+        
+        if (recordSet.err) {
+            throw new NotFoundError('User not found');
+        }
+        mongoDb.setCollection('auth');
+        const username = recordSet.data.username;
+        const dataAuth = await mongoDb.findOne({ username });
+
+        const maskedResult = {...recordSet.data, password: dataAuth.data.password};
         return maskedResult;
     } catch (error) {
         throw new BadRequestError('User not found')

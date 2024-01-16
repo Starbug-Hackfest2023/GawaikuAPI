@@ -43,7 +43,7 @@ module.exports.registerUser = async (req, res) => {
     const userData = {
         username: req.body.username,
         email: req.body.email,
-        password: md5(req.body.password),
+        password: req.body.password,
         phoneNumber: req.body.phoneNumber,
         fullname: req.body.fullname,
         address: req.body.address,
@@ -102,7 +102,7 @@ module.exports.viewUser = async (req, res) => {
 module.exports.viewProfile = async (req, res) => {
     const userData = req.userData;
 
-    authService.viewUser(userData.id)
+    authService.viewProfile(userData.id)
         .then(resp => {
             console.log('User has found');
             wrapper.response(res, 'success', wrapper.data(resp), 'User has found', 200);
