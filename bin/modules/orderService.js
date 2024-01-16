@@ -8,6 +8,7 @@ const { ObjectId } = require('mongodb');
 const { STATUS } = require('../config/const/orderStatus');
 const { viewUser } = require('./authService');
 const { viewShop } = require('./shopServices');
+const { stat } = require('fs');
 
 module.exports.userOrder = async (orderData, userData, usernameToko) => {
     try {
@@ -37,13 +38,47 @@ module.exports.userOrder = async (orderData, userData, usernameToko) => {
         // }
 
         // validasi speciality dari toko dengan pesanan
-        if (!toko.data.speciality.includes(orderData.barang)) {
+        if (!toko.data.speciality.includes(orderData.jenisBarang)) {
             throw new ConflictError('Barang tidak sesuai dengan spesialisasi toko');
         }
 
         const recordSet = await mongoDb.insertOne(orderData);
 
         return recordSet;
+    } catch (error) {
+        throw new BadRequestError(error.message);
+    }
+}
+
+module.exports.updateOrder = async (userId, usernameToko, status, namaBarang, step, activeStep) => {
+    try {
+        mongoDb.setCollection('order');
+        const pemesan = await viewUser(userId);
+        const toko = await viewShop(usernameToko);
+
+        const orderData = await mongoDb.findOne({
+            pemesan,
+            toko,
+            namaBarang,
+        });
+
+        if (validate.isEmpty(orderData)) {
+            throw new NotFoundError('Order not found');
+        }
+
+        const result = await mongoDb.upsertOne(
+            {
+                _id : new ObjectId(orderData.data._id)
+            }, {
+                $set : {
+                    status,
+                    step,
+                    activeStep
+                }
+            }
+        );
+
+        return result;
     } catch (error) {
         throw new BadRequestError(error.message);
     }
