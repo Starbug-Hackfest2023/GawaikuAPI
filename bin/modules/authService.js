@@ -201,6 +201,11 @@ module.exports.updateUser = async (userId, userData) => {
         if (validate.isEmpty(data.data)) {
             throw new NotFoundError('User not found');
         }
+        const authData = {
+            username : userData.username,
+            password : userData.password,
+            email : userData.email
+        }
 
         userData.password = md5(userData.password);
 
@@ -213,12 +218,6 @@ module.exports.updateUser = async (userId, userData) => {
 
         if (validate.isEmpty(dataAuth.data)) {
             throw new NotFoundError('User not found');
-        }
-
-        const authData = {
-            username : userData.username,
-            password : userData.password,
-            email : userData.email
         }
 
         await mongoDb.upsertOne(
