@@ -208,6 +208,26 @@ module.exports.updateUser = async (userId, userData) => {
             $set: userData
         });
 
+        mongoDb.setCollection('auth');
+        const dataAuth = await mongoDb.findOne({ username : data.data.username });
+
+        if (validate.isEmpty(dataAuth.data)) {
+            throw new NotFoundError('User not found');
+        }
+
+        const authData = {
+            username : userData.username,
+            password : userData.password,
+            email : userData.email
+        }
+
+        await mongoDb.upsertOne(
+            { username : data.data.username },
+            {
+                $set : authData
+            }
+        )
+
         const maskedResult = {...result.data, password: '****'};
         return maskedResult;
     } catch (error) {
