@@ -202,6 +202,8 @@ module.exports.updateUser = async (userId, userData) => {
             throw new NotFoundError('User not found');
         }
 
+        userData.password = md5(userData);
+
         const result = await mongoDb.upsertOne({_id}, {
             $set: userData
         });
